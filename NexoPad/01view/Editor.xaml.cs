@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,22 +22,51 @@ namespace NexoPad._01view
     {
         private GestionEditor gestor;
 
-        public Editor()
+        public Editor(bool escanear)
         {
             gestor = new GestionEditor();
-            gestor.SeleccionarCarpeta();
+            if (escanear) gestor.SeleccionarCarpeta();
             InitializeComponent();
             ListarFicheros();
         }
+
+
+        #region EVENTOS
+
+        private void AbrirCarpeta_Click(object sender, RoutedEventArgs e)
+        {
+            string rutaCarpeta = TxtUbicacion.Text.Trim();
+            if (!String.IsNullOrEmpty(rutaCarpeta) && Directory.Exists(rutaCarpeta))
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = rutaCarpeta,
+                    UseShellExecute = true
+                });
+            }
+            else MessageBox.Show("La ruta es inválida o está vacía", "Error");
+        }
+
+        private void EscanearCarpeta_Click(object sender, RoutedEventArgs e) 
+        { 
+            gestor.SeleccionarCarpeta();
+            ListarFicheros();
+        }
+
+        private void ListaNotas_SelectionChanged(object sender, SelectionChangedEventArgs e) => ActualizarCamposYPropiedades();
+
+        #endregion
+
 
         private void ListarFicheros()
         {
             var notas = gestor.Notas;
             int cantidad = notas.Count();
 
-            ListaNotas.Items.Clear();
             if (cantidad > 0) {
-                notas.Sort();
+                ListaNotas.Items.Clear();
+                notas.Sort((n1, n2) => n1.Nombre.CompareTo(n2.Nombre));
+                
                 foreach (var nota in notas)
                 {
                     var item = new ListBoxItem
@@ -48,23 +78,42 @@ namespace NexoPad._01view
                 }
             }
             TxtCantidadNotas.Text = $"{cantidad} notas";
+            ActualizarCamposYPropiedades();
         }
 
-
-
-        private void ListaNotas_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ActualizarCamposYPropiedades()
         {
-            if (ListaNotas.SelectedItem is not ListBoxItem { Tag: NotaItem notaSeleccionada }) 
-                return;
+            NotaItem? notaSeleccionada = ListaNotas.SelectedItem is ListBoxItem { Tag: NotaItem nota }
+                    ? nota
+                    : null;
 
+            var campos = new Dictionary<TextBlock, (string Titulo, Func<string?> GetDato)>()
+            {
+                [TxtTipo] = ("Tipo: ", () => notaSeleccionada?.Tipo),
+                [TxtCategoria] = ("Categoría: ", () => notaSeleccionada?.Categoria),
+                [TxtTamanyo] = ("Tamaño: ", () => notaSeleccionada?.Tamanyo),
+                [TxtCreado] = ("Creado: ", () => notaSeleccionada?.Creado),
+                [TxtModificado] = ("Modificado: ", () => notaSeleccionada?.Modificado),
+                [TxtUltimoAcceso] = ("Último acceso: ", () => notaSeleccionada?.UltimoAcceso)
+            };
+
+            foreach (var (textBlock, (titulo, getDato)) in campos)
+            {
+                string? dato = getDato();
+                textBlock.Text = string.IsNullOrWhiteSpace(dato) 
+                    ? titulo + "<sin datos>"
+                    : titulo + dato;
+            }
+
+            if (notaSeleccionada is null)
+            {
+                TxtUbicacion.Text = string.Empty;
+                EditorTexto.Text = string.Empty;
+                return;
+            }
+
+            TxtUbicacion.Text = notaSeleccionada.Ubicacion;
             EditorTexto.Text = notaSeleccionada.Contenido;
-            TxtTipo.Text = $"Tipo: {notaSeleccionada.Tipo}";
-            TxtCategoria.Text = $"Categoría: {notaSeleccionada.Categoria}";
-            TxtUbicacion.Text = $"Ubicación: {notaSeleccionada.Ubicacion}";
-            TxtTamanyo.Text = $"Tamaño: {notaSeleccionada.Tamanyo}";
-            TxtCreado.Text = $"Creado: {notaSeleccionada.Creado}";
-            TxtModificado.Text = $"Modificado: {notaSeleccionada.Modificado}";
-            TxtUltimoAcceso.Text = $"Último acceso: {notaSeleccionada.UltimoAcceso}";
         }
     }
 }

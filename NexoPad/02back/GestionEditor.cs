@@ -18,9 +18,19 @@ namespace NexoPad._02back
 
         public void SeleccionarCarpeta()
         {
-            var dialogo = new OpenFolderDialog { Title = "Escanear carpeta" };
-            if (dialogo.ShowDialog() == true) EscanearCarpeta(carpetaPath: dialogo.FolderName);
-            else MessageBox.Show("Carpeta no válida", "Error");
+            try
+            {
+                var dialog = new OpenFolderDialog 
+                { 
+                    Title = "Escanear carpeta",
+                    Multiselect = false
+                };
+                if (dialog.ShowDialog() == true) EscanearCarpeta(carpetaPath: dialog.FolderName);
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show(error.Message, "Error: algo salió mal");
+            }
         }
 
         private void EscanearCarpeta(string carpetaPath)

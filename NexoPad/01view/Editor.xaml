@@ -5,20 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NexoPad._01view"
         mc:Ignorable="d"
-        Title="Editor" Height="600" Width="1200">
+        Title="Editor" Height="600" Width="1200"
+        WindowStartupLocation="CenterScreen">
     <DockPanel>
-        <ListBox DockPanel.Dock="Right" Width="180">
+        <ListBox DockPanel.Dock="Right" Width="200">
             <ListBoxItem>
                 <TextBlock x:Name="TxtTipo"/>
             </ListBoxItem>
 
             <ListBoxItem>
                 <TextBlock x:Name="TxtCategoria"/>
-            </ListBoxItem>
-            <Separator/>
-
-            <ListBoxItem>
-                <TextBlock x:Name="TxtUbicacion"/>
             </ListBoxItem>
 
             <ListBoxItem>
@@ -57,11 +53,16 @@
             </MenuItem>
         </Menu>
 
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-            <Button Content="Nueva"/>
-            <Button Content="Guardar"/>
-            <Button Content="Borrar"/>
-        </StackPanel>
+        <DockPanel DockPanel.Dock="Top" LastChildFill="True">
+            <Button x:Name="btnEscanearCarpeta" Content="Escanear" DockPanel.Dock="Left" VerticalAlignment="Center" Padding="5" Click="EscanearCarpeta_Click"/>
+            <Button x:Name="btnAbrirCarpeta" Content="Abrir" DockPanel.Dock="Left" VerticalAlignment="Center" Padding="5" Click="AbrirCarpeta_Click"/>
+
+            <Button Content="Borrar" DockPanel.Dock="Right" Padding="5"/>
+            <Button Content="Guardar" DockPanel.Dock="Right" Padding="5"/>
+            <Button Content="Nueva" DockPanel.Dock="Right" Padding="5"/>
+
+            <TextBox x:Name="TxtUbicacion" VerticalContentAlignment="Center"/>
+        </DockPanel>
 
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem HorizontalAlignment="Left">
@@ -73,7 +74,7 @@
             </StatusBarItem>
         </StatusBar>
 
-        <ListBox x:Name="ListaNotas" DockPanel.Dock="Left" Width="180" SelectionChanged="ListaNotas_SelectionChanged"/>
+        <ListBox x:Name="ListaNotas" DockPanel.Dock="Left" Width="200" SelectionChanged="ListaNotas_SelectionChanged"/>
 
         <TextBox x:Name="EditorTexto" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
 

@@ -24,8 +24,9 @@ namespace NexoPad
             InitializeComponent();
             _pantallas = new Dictionary<Button, Func<Window>>()
             {
-                [btnEditor] = () => new Editor(),
-                // PARA PANTALLAS A FUTURO
+                [btnAbrirEditor] = () => new Editor(escanear: false),
+                [btnEscanearYEditar] = () => new Editor(escanear: true),
+                // PARA MÁS PANTALLAS A FUTURO
             };
         }
 

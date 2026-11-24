@@ -22,11 +22,12 @@ namespace NexoPad._02back
         public static NotaItem DesdeArchivo(string ruta)
         {
             var info = new FileInfo(ruta);
+            string nombreArchivo = Path.GetFileNameWithoutExtension(ruta).Trim(); // o Path.GetFileName(ruta) si quieres la extensión
 
             return new NotaItem
             {
                 RutaCompleta = ruta,
-                Nombre = Path.GetFileNameWithoutExtension(ruta), // o Path.GetFileName(ruta) si quieres la extensión
+                Nombre = String.IsNullOrEmpty(nombreArchivo) ? "<sin título>" : nombreArchivo, 
                 Contenido = File.ReadAllText(ruta),
                 Tipo = string.IsNullOrWhiteSpace(info.Extension) ? "Archivo" : info.Extension.ToUpperInvariant(),
                 Categoria = "Nota",
