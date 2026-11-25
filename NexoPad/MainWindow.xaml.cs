@@ -25,7 +25,8 @@ namespace NexoPad
             _pantallas = new Dictionary<Button, Func<Window>>()
             {
                 [btnAbrirEditor] = () => new Editor(escanear: false),
-                [btnEscanearYEditar] = () => new Editor(escanear: true),
+                [btnEscanearYEditar] = () => new Editor(escanear: true, escanearHijas: false),
+                [btnEscanearTodasYEditar] = () => new Editor(escanear: true, escanearHijas: true),
                 // PARA MÁS PANTALLAS A FUTURO
             };
         }

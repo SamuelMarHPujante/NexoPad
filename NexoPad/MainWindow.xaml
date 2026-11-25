@@ -6,15 +6,19 @@
         xmlns:local="clr-namespace:NexoPad"
         mc:Ignorable="d"
         Title="NexoPad" Height="350" Width="500"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen" Icon="/NexoPad_single.jpg">
     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Image Height="100" Width="100" Source="/NexoPad_single.jpg"/>
         <TextBlock Text="NexoPad" FontSize="36" FontWeight="Bold"
         Foreground="SteelBlue" HorizontalAlignment="Center"/>
 
         <Button x:Name="btnAbrirEditor" Content="Abrir editor"
         Width="150" Height="35" Margin="0,20,0,0" Click="Menus_Click"/>
+
+        <Button x:Name="btnEscanearYEditar" Content="Escanear carpeta"
+        Width="150" Height="35" Margin="0,10,0,0" Click="Menus_Click"/>
         
-        <Button x:Name="btnEscanearYEditar" Content="Escanear y editar"
+        <Button x:Name="btnEscanearTodasYEditar" Content="Escanear carpetas"
         Width="150" Height="35" Margin="0,10,0,0" Click="Menus_Click"/>
     </StackPanel>
 </Window>

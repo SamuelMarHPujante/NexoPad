@@ -6,62 +6,90 @@
         xmlns:local="clr-namespace:NexoPad._01view"
         mc:Ignorable="d"
         Title="Editor" Height="600" Width="1200"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen" Icon="/NexoPad_single.jpg">
     <DockPanel>
-        <ListBox DockPanel.Dock="Right" Width="200">
+        <ListBox x:Name="lbxPropiedades" DockPanel.Dock="Right" Width="200">
             <ListBoxItem>
-                <TextBlock x:Name="TxtTipo"/>
-            </ListBoxItem>
-
-            <ListBoxItem>
-                <TextBlock x:Name="TxtCategoria"/>
-            </ListBoxItem>
-
-            <ListBoxItem>
-                <TextBlock x:Name="TxtTamanyo"/>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="Trasladar" Padding="5" Click="CambiarRuta_Click"/>
+                    <Button Content="Refrescar" Padding="5"/>
+                    <CheckBox x:Name="cbxRefrescar" Content="Auto" IsChecked="True" VerticalAlignment="Center" Margin="10,0,10,0"/>
+                </StackPanel>
             </ListBoxItem>
             <Separator/>
 
             <ListBoxItem>
-                <TextBlock x:Name="TxtCreado"/>
+                <TextBlock x:Name="txtTipo" Text="X"/>
             </ListBoxItem>
 
             <ListBoxItem>
-                <TextBlock x:Name="TxtModificado"/>
+                <TextBlock x:Name="txtCategoria" Text="X"/>
             </ListBoxItem>
 
             <ListBoxItem>
-                <TextBlock x:Name="TxtUltimoAcceso"/>
+                <TextBlock x:Name="txtTamanyo" Text="X"/>
+            </ListBoxItem>
+            <Separator/>
+
+            <ListBoxItem>
+                <TextBlock x:Name="txtCreado" Text="X"/>
+            </ListBoxItem>
+
+            <ListBoxItem>
+                <TextBlock x:Name="txtModificado" Text="X"/>
+            </ListBoxItem>
+
+            <ListBoxItem>
+                <TextBlock x:Name="txtUltimoAcceso" Text="X"/>
             </ListBoxItem>
         </ListBox>
 
         <Menu DockPanel.Dock="Top">
+            <Menu.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <DockPanel HorizontalAlignment="Stretch" />
+                </ItemsPanelTemplate>
+            </Menu.ItemsPanel>
+            
             <MenuItem Header="_Archivo">
                 <MenuItem Header="_Nuevo"/>
+                <MenuItem Header="_Abrir">
+                    <MenuItem Header="_Carpeta única" Click="EscanearCarpetaUnica_Click"/>
+                    <MenuItem Header="_Carpeta e hijas" Click="EscanearCarpetaConHijas_Click"/>
+                </MenuItem>
+                <Separator/>
                 <MenuItem Header="_Guardar"/>
+                <MenuItem Header="_Guardar todo"/>
                 <Separator/>
                 <MenuItem Header="_Salir"/>
             </MenuItem>
 
             <MenuItem Header="_Edición">
+                <MenuItem Header="_Deshacer"/>
+                <MenuItem Header="_Rehacer"/>
+                <Separator/>
+                <MenuItem Header="_Cortar"/>
                 <MenuItem Header="_Copiar"/>
                 <MenuItem Header="_Pegar"/>
+                <MenuItem Header="_Duplicar"/>
+                <MenuItem Header="_Eliminar"/>
             </MenuItem>
 
             <MenuItem Header="_Ayuda">
                 <MenuItem Header="_Acerca de"/>
             </MenuItem>
+
+            <MenuItem Header="Propiedades" HorizontalAlignment="Right" Click="TogglePropiedades_Click"/>
         </Menu>
 
         <DockPanel DockPanel.Dock="Top" LastChildFill="True">
-            <Button x:Name="btnEscanearCarpeta" Content="Escanear" DockPanel.Dock="Left" VerticalAlignment="Center" Padding="5" Click="EscanearCarpeta_Click"/>
-            <Button x:Name="btnAbrirCarpeta" Content="Abrir" DockPanel.Dock="Left" VerticalAlignment="Center" Padding="5" Click="AbrirCarpeta_Click"/>
+            <Button x:Name="btnVerCarpeta" Content="Ver" DockPanel.Dock="Left" VerticalAlignment="Center" Padding="5" Click="VerCarpeta_Click"/>
 
-            <Button Content="Borrar" DockPanel.Dock="Right" Padding="5"/>
-            <Button Content="Guardar" DockPanel.Dock="Right" Padding="5"/>
-            <Button Content="Nueva" DockPanel.Dock="Right" Padding="5"/>
+            <Button Content="Borrar" x:Name="btnBorrarRuta" DockPanel.Dock="Right" Padding="5" Click="BorrarRuta_Click"/>
+            <Button Content="Pegar" x:Name="btnPegarRuta" DockPanel.Dock="Right" Padding="5" Click="PegarRuta_Click"/>
+            <Button Content="Copiar" x:Name="btnCopiarRuta" DockPanel.Dock="Right" Padding="5" Click="CopiarRuta_Click"/>
 
-            <TextBox x:Name="TxtUbicacion" VerticalContentAlignment="Center"/>
+            <TextBox x:Name="tbxUbicacion" VerticalContentAlignment="Center"/>
         </DockPanel>
 
         <StatusBar DockPanel.Dock="Bottom">
@@ -70,13 +98,14 @@
             </StatusBarItem>
 
             <StatusBarItem HorizontalAlignment="Right">
-                <TextBlock x:Name="TxtCantidadNotas" Text="3 notas"/>
+                <TextBlock x:Name="txtCantidadNotas" Text="X"/>
             </StatusBarItem>
         </StatusBar>
 
-        <ListBox x:Name="ListaNotas" DockPanel.Dock="Left" Width="200" SelectionChanged="ListaNotas_SelectionChanged"/>
+        <ListBox x:Name="lbxListaNotas" DockPanel.Dock="Left" Width="200" SelectionChanged="ListaNotas_SelectionChanged"/>
 
-        <TextBox x:Name="EditorTexto" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+        <TextBox x:Name="tbxEditorTexto" AcceptsReturn="True" FontFamily="Consolas" FontSize="11" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+        TextChanged="TextoEditorCambiado_TextChanged"/>
 
     </DockPanel>
 </Window>
