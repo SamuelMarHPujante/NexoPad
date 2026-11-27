@@ -89,7 +89,7 @@
             <Button Content="Pegar" x:Name="btnPegarRuta" DockPanel.Dock="Right" Padding="5" Click="PegarRuta_Click"/>
             <Button Content="Copiar" x:Name="btnCopiarRuta" DockPanel.Dock="Right" Padding="5" Click="CopiarRuta_Click"/>
 
-            <TextBox x:Name="tbxUbicacion" VerticalContentAlignment="Center"/>
+            <TextBox x:Name="tbxCarpetaPadre" VerticalContentAlignment="Center"/>
         </DockPanel>
 
         <StatusBar DockPanel.Dock="Bottom">

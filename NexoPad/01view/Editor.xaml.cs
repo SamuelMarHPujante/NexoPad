@@ -57,7 +57,7 @@ namespace NexoPad._01view
 
         private void VerCarpeta_Click(object sender, RoutedEventArgs e)
         {
-            string rutaCarpeta = tbxUbicacion.Text.Trim();
+            string rutaCarpeta = tbxCarpetaPadre.Text.Trim();
             if (!string.IsNullOrEmpty(rutaCarpeta) && Directory.Exists(rutaCarpeta))
             {
                 Process.Start(new ProcessStartInfo
@@ -75,11 +75,11 @@ namespace NexoPad._01view
 
         private void ListaNotas_SelectionChanged(object sender, SelectionChangedEventArgs e) => ActualizarCamposYPropiedades();
 
-        private void CopiarRuta_Click(object sender, RoutedEventArgs e) => Clipboard.SetText(tbxUbicacion.Text);
+        private void CopiarRuta_Click(object sender, RoutedEventArgs e) => Clipboard.SetText(tbxCarpetaPadre.Text);
 
-        private void PegarRuta_Click(object sender, RoutedEventArgs e) => tbxUbicacion.Text = Clipboard.GetText(); 
+        private void PegarRuta_Click(object sender, RoutedEventArgs e) => tbxCarpetaPadre.Text = Clipboard.GetText(); 
 
-        private void BorrarRuta_Click(object sender, RoutedEventArgs e) => tbxUbicacion.Clear();
+        private void BorrarRuta_Click(object sender, RoutedEventArgs e) => tbxCarpetaPadre.Clear();
 
         private void RefrescarPropiedades_Click(object sender, RoutedEventArgs e) => ActualizarCamposYPropiedades();
 
@@ -105,11 +105,16 @@ namespace NexoPad._01view
                     return;
                 }
 
-                string nuevaRuta = tbxUbicacion.Text.Trim();
-                int codigoProceso = gestor.CambiarRuta(nota, nuevaRuta);
+                string carpetaDestino = tbxCarpetaPadre.Text.Trim();
+                int codigoProceso = gestor.CambiarRuta(nota, carpetaDestino);
 
-                if (codigoProceso == -1) MessageBox.Show("La ruta no es válida o faltan permisos", "Error de traslado");
-                else MessageBox.Show("Archivo movido con éxito", "Traslado exitoso");
+                if (codigoProceso == -1) 
+                    MessageBox.Show("La ruta no es válida o faltan permisos", "Error de traslado");
+                else 
+                {
+                    tbxCarpetaPadre.Text = nota.CarpetaPadre; 
+                    MessageBox.Show("Archivo movido con éxito", "Traslado exitoso"); 
+                }
             }
         }
 
@@ -191,12 +196,12 @@ namespace NexoPad._01view
 
             if (notaSeleccionada is null)
             {
-                tbxUbicacion.Text = string.Empty;
+                tbxCarpetaPadre.Text = string.Empty;
                 tbxEditorTexto.Text = string.Empty;
                 return;
             }
 
-            tbxUbicacion.Text = notaSeleccionada.Ubicacion;
+            tbxCarpetaPadre.Text = notaSeleccionada.CarpetaPadre;
             tbxEditorTexto.Text = notaSeleccionada.Contenido;
         }
     }

@@ -80,32 +80,38 @@ namespace NexoPad._02back
         {
             try
             {
-                string carpetaOrigen = notaPorMover.RutaCarpeta;
-                if (string.IsNullOrWhiteSpace(carpetaOrigen) || string.IsNullOrWhiteSpace(carpetaDestino))
+                string rutaOriginal = notaPorMover.RutaCompleta;
+                if (string.IsNullOrWhiteSpace(rutaOriginal) || string.IsNullOrWhiteSpace(carpetaDestino))
                 {
                     Debug.WriteLine("Una de las rutas es null o está vacia", "Error");
                     return -1;
                 }
 
-                string nombreArchivo = Path.GetFileName(carpetaOrigen);
-                string ubicacionDestino = carpetaDestino;
+                if (!File.Exists(rutaOriginal))
+                {
+                    Debug.WriteLine("El archivo original no existe: " + rutaOriginal, "Error");
+                    return -1;
+                }
 
-                if (Directory.Exists(carpetaDestino) || string.IsNullOrEmpty(Path.GetExtension(carpetaDestino)))
-                    ubicacionDestino = Path.Combine(carpetaDestino, nombreArchivo);
+                string nombreArchivo = Path.GetFileName(rutaOriginal);
+                string rutaArchivoDestino = Path.Combine(carpetaDestino, nombreArchivo);
 
                 if (string.Equals(
-                        Path.GetFullPath(carpetaOrigen),
-                        Path.GetFullPath(ubicacionDestino),
-                        StringComparison.OrdinalIgnoreCase)
-                )
-                    return 0;
+                        Path.GetFullPath(rutaOriginal),
+                        Path.GetFullPath(rutaArchivoDestino),
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    Debug.WriteLine("La ruta original y final son idénticas", "Warning");
+                    return 0; 
+                }
 
-                string? ubicacionFinal = Path.GetDirectoryName(ubicacionDestino);
-                if (!string.IsNullOrEmpty(ubicacionFinal)) Directory.CreateDirectory(ubicacionFinal);
+                string? ubicacionFinal = Path.GetDirectoryName(rutaArchivoDestino);
+                if (!string.IsNullOrEmpty(ubicacionFinal)) 
+                    Directory.CreateDirectory(ubicacionFinal);
 
-                File.Move(carpetaOrigen, ubicacionDestino, overwrite: true);
-                notaPorMover.RutaCarpeta = ubicacionDestino;
-                notaPorMover.Ubicacion = ubicacionFinal ?? string.Empty;
+                File.Move(rutaOriginal, rutaArchivoDestino, overwrite: true);
+                notaPorMover.RutaCompleta = rutaArchivoDestino;
+                notaPorMover.CarpetaPadre = ubicacionFinal ?? string.Empty;
                 return 0;
             }
             catch (IOException error)
