@@ -1,23 +1,45 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Windows;
-using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NexoPad._02back
 {
     class GestionEditor
     {
         public List<NotaItem> Notas { get; set; } = new();
-
-        public GestionEditor()
+        private readonly HashSet<string> EXTENSIONES = new HashSet<string>(comparer: StringComparer.OrdinalIgnoreCase)
         {
-            
+            ".txt",
+            ".md",
+            ".gitignore"
+        };
+
+        #region LECTURA Y ESCRITURA
+
+        private int CrearNota(/* Parámetros por debatir */)
+        {
+            return -1;
         }
 
-        public void SeleccionarCarpeta(bool escanearHijas)
+        private int GuardarNota(NotaItem notaPorGuardar)
+        {
+            return -1;
+        }
+
+        private int BorrarNota(NotaItem notaPorBorrar)
+        {
+            return -1;
+        }
+
+        #endregion
+
+
+        public int SeleccionarYEscanearCarpeta(bool escanearHijas)
         {
             try
             {
@@ -26,69 +48,74 @@ namespace NexoPad._02back
                     Title = "Escanear carpeta",
                     Multiselect = false
                 };
-                if (dialog.ShowDialog() == true) EscanearCarpeta(carpetaPath: dialog.FolderName, escanearHijas);
+
+                if (dialog.ShowDialog() == true) 
+                {
+                    string carpetaPath = dialog.FolderName;
+                    SearchOption opcionEscaneo = escanearHijas ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+                    var archivosHallados = Directory.EnumerateFiles(carpetaPath, "*", opcionEscaneo)
+                        .Where(ruta => EXTENSIONES.Contains(Path.GetExtension(ruta)))
+                        .Select(NotaItem.DesdeArchivo)
+                        .ToList();
+
+                    if (archivosHallados.Count() > 0) 
+                    { 
+                        this.Notas = archivosHallados;
+                        return 0;
+                    }
+
+                    Debug.WriteLine("No hay archivos de texto en la carpeta escaneada", "Error");
+                    return -1;
+                }
+                return 0;
             }
             catch (Exception error)
             {
-                MessageBox.Show(error.Message, "Error: algo salió mal");
+                Debug.WriteLine("Algo salió mal al escanear: " + error.Message, "Error");
+                return -1;
             }
         }
 
-        private void EscanearCarpeta(string carpetaPath, bool escanearHijas)
-        {
-            var extensiones = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            {
-                ".txt", 
-                ".md", 
-                ".gitignore"
-            };
-
-            SearchOption opcionEscaneo = escanearHijas ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-            var archivosHallados = Directory.EnumerateFiles(carpetaPath, "*", opcionEscaneo)
-                .Where(ruta => extensiones.Contains(Path.GetExtension(ruta)))
-                .Select(NotaItem.DesdeArchivo)
-                .ToList();
-
-            if (archivosHallados.Count() > 0) this.Notas = archivosHallados;
-            else MessageBox.Show("No hay archivos de texto en esta carpeta", "Error");
-        }
-
-        public int CambiarRuta(NotaItem nota, string rutaDestino)
+        public int CambiarRuta(NotaItem notaPorMover, string carpetaDestino)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(nota.RutaCompleta) || string.IsNullOrWhiteSpace(rutaDestino))
+                string carpetaOrigen = notaPorMover.RutaCarpeta;
+                if (string.IsNullOrWhiteSpace(carpetaOrigen) || string.IsNullOrWhiteSpace(carpetaDestino))
+                {
+                    Debug.WriteLine("Una de las rutas es null o está vacia", "Error");
                     return -1;
+                }
 
-                string nombreArchivo = Path.GetFileName(nota.RutaCompleta);
-                string rutaArchivoDestino = rutaDestino;
+                string nombreArchivo = Path.GetFileName(carpetaOrigen);
+                string ubicacionDestino = carpetaDestino;
 
-                if (Directory.Exists(rutaDestino) || string.IsNullOrEmpty(Path.GetExtension(rutaDestino)))
-                    rutaArchivoDestino = Path.Combine(rutaDestino, nombreArchivo);
+                if (Directory.Exists(carpetaDestino) || string.IsNullOrEmpty(Path.GetExtension(carpetaDestino)))
+                    ubicacionDestino = Path.Combine(carpetaDestino, nombreArchivo);
 
                 if (string.Equals(
-                        Path.GetFullPath(nota.RutaCompleta),
-                        Path.GetFullPath(rutaArchivoDestino),
+                        Path.GetFullPath(carpetaOrigen),
+                        Path.GetFullPath(ubicacionDestino),
                         StringComparison.OrdinalIgnoreCase)
                 )
                     return 0;
 
-                string? carpetaDestino = Path.GetDirectoryName(rutaArchivoDestino);
-                if (!string.IsNullOrEmpty(carpetaDestino)) Directory.CreateDirectory(carpetaDestino);
+                string? ubicacionFinal = Path.GetDirectoryName(ubicacionDestino);
+                if (!string.IsNullOrEmpty(ubicacionFinal)) Directory.CreateDirectory(ubicacionFinal);
 
-                File.Move(nota.RutaCompleta, rutaArchivoDestino, overwrite: true);
-                nota.RutaCompleta = rutaArchivoDestino;
-                nota.Ubicacion = carpetaDestino ?? string.Empty;
+                File.Move(carpetaOrigen, ubicacionDestino, overwrite: true);
+                notaPorMover.RutaCarpeta = ubicacionDestino;
+                notaPorMover.Ubicacion = ubicacionFinal ?? string.Empty;
                 return 0;
             }
             catch (IOException error)
             {
-                Debug.WriteLine("Error de ficheros en CambiarRuta(): " + error.Message);
+                Debug.WriteLine("Error de ficheros al trasladar: " + error.Message, "Error");
                 return -1;
             }
             catch (UnauthorizedAccessException error)
             {
-                Debug.WriteLine("Error de acceso en CambiarRuta(): " + error.Message);
+                Debug.WriteLine("Error de permisos al trasladar: " + error.Message, "Error");
                 return -1;
             }
         }

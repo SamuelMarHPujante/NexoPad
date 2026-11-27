@@ -7,7 +7,7 @@ namespace NexoPad._02back
 {
     class NotaItem
     {
-        public string RutaCompleta { get; set; } = string.Empty;
+        public string RutaCarpeta { get; set; } = string.Empty;
         public string Nombre { get; set; } = string.Empty;
         public string Contenido { get; set; } = string.Empty;
 
@@ -24,7 +24,7 @@ namespace NexoPad._02back
             var info = new FileInfo(ruta);
             return new NotaItem
             {
-                RutaCompleta = ruta,
+                RutaCarpeta = ruta,
                 Nombre = Path.GetFileNameWithoutExtension(ruta).Trim(), // o Path.GetFileName(ruta) si quieres la extensión, 
                 Contenido = File.ReadAllText(ruta),
                 Tipo = string.IsNullOrWhiteSpace(info.Extension) ? "Archivo" : info.Extension.ToUpperInvariant(),

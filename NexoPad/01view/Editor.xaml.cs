@@ -23,16 +23,26 @@ namespace NexoPad._01view
     {
         private GestionEditor gestor;
 
-        public Editor(bool escanear, bool escanearHijas = false)
+        public Editor()
         {
-            gestor = new GestionEditor();
+            init();
+            ListarFicheros();
+        }
+
+        public Editor(bool escanearHijas)
+        {
+            init();
+            EscanearCarpeta(escanearHijas);
+        }
+
+        private void init()
+        {
             InitializeComponent();
-            if (escanear) EscanearCarpeta(escanearHijas);
-            else ListarFicheros();
+            gestor = new GestionEditor();
         }
 
 
-        #region EVENRTOS MENU
+        #region EVENTOS MENU
 
         private void TogglePropiedades_Click(object sender, RoutedEventArgs e) 
         {
@@ -41,6 +51,7 @@ namespace NexoPad._01view
         }
 
         #endregion
+
 
         #region EVENTOS EDITOR
 
@@ -74,9 +85,15 @@ namespace NexoPad._01view
 
         private void TextoEditorCambiado_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (cbxRefrescar.IsChecked == true) ActualizarCamposYPropiedades();
+            // if (cbxRefrescar.IsChecked == true) ActualizarCamposYPropiedades();
+
+            NotaItem? notaSeleccionada = GetNotaSeleccionada();
+            if (notaSeleccionada != null)
+            {
+                // mostrar en nombre algo que indique que la nota está por guardar
+            }
         }
-        
+
         private void CambiarRuta_Click(object sender, RoutedEventArgs e)
         {
             MessageBoxResult resultado = PedirConfirmacion("¿Estás seguro de que deseas cambiar la ruta de este archivo?");
@@ -99,6 +116,7 @@ namespace NexoPad._01view
 
         #endregion
 
+
         private MessageBoxResult PedirConfirmacion(string consulta)
         {
             return MessageBox.Show(
@@ -110,9 +128,17 @@ namespace NexoPad._01view
             );
         }
 
+        private NotaItem? GetNotaSeleccionada()
+        {
+            return lbxListaNotas.SelectedItem is ListBoxItem { Tag: NotaItem nota }
+                ? nota
+                : null;
+        }
+
         private void EscanearCarpeta(bool escanearHijas)
         {
-            gestor.SeleccionarCarpeta(escanearHijas);
+            int codigoProceso = gestor.SeleccionarYEscanearCarpeta(escanearHijas);
+            if (codigoProceso == -1) MessageBox.Show("Ha habido un error o no hay archivos de texto en esta carpeta", "Error de escaneado");
             ListarFicheros();
         }
 
@@ -144,10 +170,7 @@ namespace NexoPad._01view
 
         private void ActualizarCamposYPropiedades()
         {
-            NotaItem? notaSeleccionada = lbxListaNotas.SelectedItem is ListBoxItem { Tag: NotaItem nota }
-                    ? nota
-                    : null;
-
+            NotaItem? notaSeleccionada = GetNotaSeleccionada();
             var campos = new Dictionary<TextBlock, (string Titulo, Func<string?> GetDato)>()
             {
                 [txtTipo] = ("Tipo: ", () => notaSeleccionada?.Tipo),
